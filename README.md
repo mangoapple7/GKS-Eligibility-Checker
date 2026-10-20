@@ -1,5 +1,6 @@
 GKS-U 2027 Eligibility checker
  video demo: https://youtu.be/UobgWwX1fjE
+ I improvised the existing model by changing the check_age funtion to check_birthdate function so its more accurate. 
  
 
 🎀Description🎀
