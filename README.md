@@ -1,3 +1,17 @@
+# note-
+ GKS-UG 2027 Eligibility Checker
+
+Developed an interactive web application using HTML, CSS, and JavaScript to help users check basic GKS-UG eligibility criteria.
+
+**AI assistance:** Used AI tools to help debug issues and understand unfamiliar concepts during development.
+
+**Live demo:** https://mangoapple7.github.io/GKS-Eligibility-Checker/
+
+
+
+
+
+
 GKS-U 2027 Eligibility checker
  video demo: https://youtu.be/UobgWwX1fjE
  I improvised the existing model by changing the check_age funtion to check_birthdate function so its more accurate. 
