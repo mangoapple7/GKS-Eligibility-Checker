@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GKS-UG 2027 Eligibility Checker</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg1:#f1e6ff;--bg2:#ffe3f1;--card:#fff;--text:#2a1b3d;--muted:#7a6a8f;--line:#ecdcf7;--field:#fbf6ff;--accent:#8e44ec;--accent2:#ec4899;--ok:#0f7b57;--okbg:#e2f6ee;--bad:#b3261e;--badbg:#fdeceb;--shadow:0 10px 30px rgba(150,70,200,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#1e1030;--bg2:#2e1230;--card:#2a1840;--text:#f6eefc;--muted:#bba6d1;--line:#44305f;--field:#1f1131;--accent:#a66cf0;--accent2:#f472b6;--ok:#4cd5a1;--okbg:#13362b;--bad:#ff9a92;--badbg:#3d1d1b;--shadow:0 10px 30px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg1:#1e1030;--bg2:#2e1230;--card:#2a1840;--text:#f6eefc;--muted:#bba6d1;--line:#44305f;--field:#1f1131;--accent:#a66cf0;--accent2:#f472b6;--ok:#4cd5a1;--okbg:#13362b;--bad:#ff9a92;--badbg:#3d1d1b;--shadow:0 10px 30px rgba(0,0,0,.4)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:24px 16px 40px}
+.wrap{max-width:480px;margin:0 auto;position:relative}
+.top{text-align:center;margin-bottom:20px}
+.logo{width:68px;height:68px;margin:0 auto 10px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:var(--shadow);animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-5px)}}
+h1{font-size:1.55rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+label{display:block;font-weight:600;font-size:.92rem;margin:16px 0 6px}
+label:first-of-type{margin-top:0}
+input,select{width:100%;padding:12px 14px;font-size:1rem;border:1.5px solid var(--line);border-radius:12px;background:var(--field);color:var(--text);transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(168,85,247,.22)}
+.err{color:var(--bad);font-size:.85rem;margin-top:4px;min-height:1.1em}
+#go{width:100%;margin-top:18px;padding:14px;font-size:1rem;font-weight:700;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 16px rgba(200,70,190,.35)}
+#go:hover{transform:translateY(-2px)}#go:active{transform:translateY(0)}
+#results{display:none;margin-top:22px;border-top:1px dashed var(--line);padding-top:20px}
+.big{text-align:center;margin-bottom:14px}
+.big .face{font-size:56px;line-height:1.1;display:block}
+.big .t{font-size:1.2rem;font-weight:700;margin-top:6px}
+.big .s{color:var(--muted);font-size:.92rem}
+.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.wob{animation:wob .6s}
+@keyframes wob{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.res{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:10px;animation:slide .4s both}
+@keyframes slide{from{transform:translateY(8px);opacity:0}}
+.res .ic{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.res.ok{background:var(--okbg)}.res.ok .ic{background:var(--ok);color:var(--okbg)}
+.res.no{background:var(--badbg)}.res.no .ic{background:var(--bad);color:var(--badbg)}
+.res b{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.res span{font-weight:500}
+.note{color:var(--muted);font-size:.8rem;text-align:center;margin-top:18px}
+#mute{position:absolute;top:0;right:0;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="wrap">
+  <button id="mute" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+  <div class="top">
+    <div class="logo">🎓</div>
+    <h1>GKS-UG 2027</h1>
+    <p class="sub">Check if you meet the basic requirements</p>
+  </div>
+  <div class="card" id="card">
+    <label for="dob">Date of birth</label>
+    <input type="date" id="dob"><div class="err" id="e-dob"></div>
+    <label for="grade">High school average score (%)</label>
+    <input type="number" id="grade" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 85.5"><div class="err" id="e-grade"></div>
+    <label for="country">Which country are you from?</label>
+    <select id="country"></select><div class="err" id="e-country"></div>
+    <button id="go">Check my eligibility</button>
+    <div id="results" aria-live="polite"></div>
+  </div>
+  <p class="note">Unofficial tool. Always confirm requirements in the official GKS announcement.</p>
+</div>
+
+<script>
+var EMBASSY=["Afghanistan","Angola","Azerbaijan","Bahamas","Bangladesh","Bolivia","Brazil","Brunei","Bulgaria","Cambodia","Canada","Chile","Colombia","Costa Rica","Cuba","Czech Republic","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Ethiopia","Fiji","Gabon","Ghana","Guatemala","India","Indonesia","Iran","Iraq","Jordan","Kazakhstan","Kenya","Kyrgyzstan","Laos","Madagascar","Malaysia","Mexico","Mongolia","Morocco","Mozambique","Myanmar","Nepal","Nigeria","Pakistan","Panama","Paraguay","Peru","Philippines","Poland","Russia","Rwanda","Saudi Arabia","Singapore","South Africa","South Sudan","Sri Lanka","Sweden","Syria","Tajikistan","Tanzania","Thailand","Timor-Leste","Trinidad and Tobago","Türkiye","Turkmenistan","Uganda","Ukraine","Uruguay","Uzbekistan","Venezuela","Vietnam","Yemen","Zimbabwe"];
+var sel=document.getElementById("country");
+function opt(v,t){var o=document.createElement("option");o.value=v;o.textContent=t;sel.appendChild(o);}
+opt("","Select your country…");EMBASSY.forEach(function(c){opt(c,c);});opt("South Korea","South Korea");opt("OTHER","Other (not in the list above)");
+
+function checkAge(d){return d>=new Date(2002,2,1)?[true,"Age requirement satisfied"]:[false,"You must be born on or after 1 March 2002"];}
+function checkGrades(g){if(g>=90)return[true,"Excellent, you are well above the required percentage"];if(g>=80)return[true,"Grade requirement satisfied"];return[false,"Your score is below the required percentage"];}
+function checkCountry(c){if(c==="South Korea")return[false,"Korean citizens cannot apply for this scholarship"];if(EMBASSY.indexOf(c)!==-1)return[true,"You can apply through both Embassy and University track"];return[true,"You can only apply through University track"];}
+function setErr(id,m){document.getElementById(id).textContent=m;return!m;}
+
+/* ---------- sound (made in the browser, no files needed) ---------- */
+var muted=false,ac=null;
+document.getElementById("mute").onclick=function(){muted=!muted;this.textContent=muted?"🔇":"🔊";};
+function note(f,t,d,type,v,slideTo){
+  var o=ac.createOscillator(),g=ac.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,ac.currentTime+t);
+  if(slideTo)o.frequency.linearRampToValueAtTime(slideTo,ac.currentTime+t+d);
+  g.gain.setValueAtTime(0.0001,ac.currentTime+t);
+  g.gain.exponentialRampToValueAtTime(v,ac.currentTime+t+0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+t+d);
+  o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+t);o.stop(ac.currentTime+t+d+0.05);
+}
+function playSound(happy){
+  if(muted)return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended")ac.resume();
+    if(happy){
+      [523.25,659.25,783.99,1046.5,783.99,1046.5,1318.5].forEach(function(f,i){note(f,i*0.11,0.3,"triangle",0.22);});
+      note(1046.5,0.8,0.7,"triangle",0.18);note(1318.5,0.8,0.7,"triangle",0.15);note(1568,0.8,0.7,"triangle",0.12);
+    }else{
+      note(392,0,0.35,"sine",0.28);note(370,0.4,0.35,"sine",0.28);note(349,0.8,0.35,"sine",0.28);note(330,1.2,0.9,"sine",0.28,300);
+    }
+  }catch(e){}
+}
+
+/* ---------- confetti / sad rain ---------- */
+var cv=document.getElementById("fx"),cx=cv.getContext("2d"),parts=[],raf=null;
+function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;}
+size();addEventListener("resize",size);
+function run(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(function(p){return p.y<cv.height+60&&p.life>0;});
+  parts.forEach(function(p){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.r+=p.vr;p.life--;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);
+    if(p.e){cx.font=p.s+"px serif";cx.globalAlpha=0.85;cx.fillText(p.e,0,0);}
+    else{cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/3,p.s,p.s*0.6);}
+    cx.restore();
+  });
+  raf=parts.length?requestAnimationFrame(run):null;
+  if(!raf)cx.clearRect(0,0,cv.width,cv.height);
+}
+function burst(happy){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  var d=devicePixelRatio,cols=["#8e44ec","#c084fc","#ec4899","#f9a8d4","#fbbf24","#e879f9"];
+  if(happy){
+    for(var k=0;k<2;k++)for(var i=0;i<90;i++){
+      var a=Math.random()*Math.PI-Math.PI,sp=(8+Math.random()*10)*d;
+      parts.push({x:cv.width*(k?0.85:0.15),y:cv.height*0.75,vx:Math.cos(a)*sp*(k?-0.6:0.6)+(k?-1:1)*2*d,vy:Math.sin(a)*sp,g:0.3*d,r:Math.random()*6,vr:(Math.random()-.5)*.4,s:(6+Math.random()*7)*d,c:cols[i%cols.length],life:240});
+    }
+  }else{
+    for(var j=0;j<28;j++)parts.push({x:Math.random()*cv.width,y:-Math.random()*cv.height*0.6,vx:0,vy:(1.5+Math.random()*2)*d,g:0.02*d,r:0,vr:0,s:(22+Math.random()*14)*d,e:j%3?"💧":"😢",life:400});
+  }
+  if(!raf)run();
+}
+
+/* ---------- main ---------- */
+document.getElementById("go").addEventListener("click",function(){
+  var dobVal=document.getElementById("dob").value,gv=document.getElementById("grade").value,country=sel.value,ok=true,dob=null;
+  if(!dobVal)ok=setErr("e-dob","Please enter your date of birth.")&&ok;
+  else{var p=dobVal.split("-");dob=new Date(+p[0],+p[1]-1,+p[2]);
+    if(dob>new Date()){ok=setErr("e-dob","Date of birth cannot be in the future.")&&ok;dob=null;}else setErr("e-dob","");}
+  var grade=parseFloat(gv);
+  if(gv===""||isNaN(grade)||grade<0||grade>100){ok=setErr("e-grade","Please enter a valid percentage between 0 and 100.")&&ok;grade=null;}else setErr("e-grade","");
+  if(!country)ok=setErr("e-country","Please select your country.")&&ok;else setErr("e-country","");
+  var box=document.getElementById("results");
+  if(!dob||grade===null||!country){box.style.display="none";return;}
+
+  var items=[["Age",checkAge(dob)],["Grades",checkGrades(grade)],["Country",checkCountry(country)]];
+  var pass=items.every(function(r){return r[1][0];});
+  box.innerHTML="";
+  var big=document.createElement("div");big.className="big";
+  big.innerHTML='<span class="face pop">'+(pass?"🎉":"🥺")+'</span><div class="t">'+(pass?"You’re eligible to apply!":"Not eligible this time")+'</div><div class="s">'+(pass?"You meet all the basic requirements. Good luck!":"Please review the points below and check the official announcement.")+'</div>';
+  box.appendChild(big);
+  items.forEach(function(r,i){
+    var d=document.createElement("div");d.className="res "+(r[1][0]?"ok":"no");d.style.animationDelay=(i*0.12)+"s";
+    d.innerHTML='<div class="ic">'+(r[1][0]?"✓":"✗")+'</div><div><b>'+r[0]+'</b><span></span></div>';
+    d.querySelector("span").textContent=r[1][1];box.appendChild(d);
+  });
+  box.style.display="block";
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  if(!pass){var c=document.getElementById("card");c.classList.remove("wob");void c.offsetWidth;c.classList.add("wob");}
+  playSound(pass);burst(pass);
+});
+</script>
+</body>
+</html>
